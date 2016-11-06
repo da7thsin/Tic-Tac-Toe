@@ -1,3 +1,31 @@
-*{
-  background: #ff9e7e;
+.menu, .game{
+  display: none;
+  margin: 15vh auto;
+  width: 70vw;
+  height: 100%;
+}
+
+.menu .title{
+  text-align: center;
+}
+
+.menu .choices{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.choices .choice{
+  margin: 10px auto;
+  border: 2px solid #000;
+  width: 400px;
+  height: 200px;
+  text-align: center;
+  font-size: 30px;
+  line-height: 30px;
+  cursor: pointer;
+}
+
+.active{
+  display: block;
 }
