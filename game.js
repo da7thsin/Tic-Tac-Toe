@@ -1,3 +1,11 @@
+
+function Game(isHuman){
+  this.isHuman = isHuman;
+}
+
+
+
+
 $(document).ready(function(){
-  alert('working');
+  game.start();
 });
