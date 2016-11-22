@@ -11,6 +11,34 @@ function Game(playerOne, playerTwo){
     playerTwo = this;
   }
 
+  function assign(){
+    board[Math.floor(Math.random() * board.length)].innerHTML = playerTwo.sign;
+  }
+
+  function init(){
+    if(!finished){
+
+      $('.grid').click(function(){
+        if(playerOne.turn && !finished){
+          $(this).text(playerOne.sign);
+          playerOne.turn = false;
+          playerTwo.turn = true;
+          checkBoard(playerOne);
+          setTimeout(init, 1000);
+        }
+      });
+
+      if(playerTwo.turn){
+        assign();
+        playerTwo.turn = false;
+        playerOne.turn = true;
+        checkBoard(playerTwo);
+        setTimeout(init, 1000);
+      }
+
+    }
+  }
+
   function checkBoard(player){
     for(var i = 0; i < win.length; i++){
       var a = board[win[i][0]].innerHTML;
@@ -33,7 +61,7 @@ function Game(playerOne, playerTwo){
   })(playerOne.sign);
 
   this.start = function(){
-    
+    init();
   }
 
 }
