@@ -12,7 +12,13 @@ function Game(playerOne, playerTwo){
   }
 
   function assign(){
-    board[Math.floor(Math.random() * board.length)].innerHTML = playerTwo.sign;
+    var grid = $(board[Math.floor(Math.random() * board.length)]);
+    if(grid.text() == ""){
+      grid.text(playerTwo.sign);
+    }
+    else{
+      assign();
+    }
   }
 
   function init(){
@@ -45,8 +51,8 @@ function Game(playerOne, playerTwo){
       var b = $(board[win[i][1]]).text();
       var c = $(board[win[i][2]]).text();
 
-      console.log(a,b,c);
       if(a == player.sign && b == player.sign && c == player.sign){
+        alert('Game Over!\n' + player.sign +' Won!');
         finished = true;
         player.score++;
         break;
