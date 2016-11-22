@@ -41,10 +41,11 @@ function Game(playerOne, playerTwo){
 
   function checkBoard(player){
     for(var i = 0; i < win.length; i++){
-      var a = board[win[i][0]].innerHTML;
-      var b = board[win[i][1]].innerHTML;
-      var c = board[win[i][2]].innerHTML;
+      var a = $(board[win[i][0]]).text();
+      var b = $(board[win[i][1]]).text();
+      var c = $(board[win[i][2]]).text();
 
+      console.log(a,b,c);
       if(a == player.sign && b == player.sign && c == player.sign){
         finished = true;
         player.score++;
