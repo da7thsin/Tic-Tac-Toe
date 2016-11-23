@@ -12,7 +12,6 @@ function Game(playerOne, playerTwo){
   }
 
   function assign(){
-    var randomGrid = $(board[Math.floor(Math.random() * board.length)]);
 
     for(var index = 0; index < win.length; index++){
       var a = $(board[win[index][0]]), b = $(board[win[index][1]]), c = $(board[win[index][2]]);
@@ -31,6 +30,7 @@ function Game(playerOne, playerTwo){
       }
 
     }
+    
   }
 
   function init(){
