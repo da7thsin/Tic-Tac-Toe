@@ -12,12 +12,24 @@ function Game(playerOne, playerTwo){
   }
 
   function assign(){
-    var grid = $(board[Math.floor(Math.random() * board.length)]);
-    if(grid.text() == ""){
-      grid.text(playerTwo.sign);
-    }
-    else{
-      assign();
+    var randomGrid = $(board[Math.floor(Math.random() * board.length)]);
+
+    for(var index = 0; index < win.length; index++){
+      var a = $(board[win[index][0]]), b = $(board[win[index][1]]), c = $(board[win[index][2]]);
+
+      if(!c.text() && a.text() == playerOne.sign && b.text() == playerOne.sign || a.text() == playerTwo.sign && b.text() == playerTwo.sign){
+        c.text(playerTwo.sign);
+        break;
+      }
+      else if(!a.text() && b.text() == playerOne.sign && c.text() == playerOne.sign || b.text() == playerTwo.sign && c.text() == playerTwo.sign){
+        a.text(playerTwo.sign);
+        break;
+      }
+      else if(!b.text() && a.text() == playerOne.sign && c.text() == playerOne.sign || a.text() == playerTwo.sign && c.text() == playerTwo.sign){
+        b.text(playerTwo.sign);
+        break;
+      }
+
     }
   }
 
@@ -25,7 +37,7 @@ function Game(playerOne, playerTwo){
     if(!finished){
 
       $('.grid').click(function(){
-        if(playerOne.turn && !finished){
+        if(playerOne.turn && !finished && !$(this).text()){
           $(this).text(playerOne.sign);
           playerOne.turn = false;
           playerTwo.turn = true;
@@ -52,7 +64,6 @@ function Game(playerOne, playerTwo){
       var c = $(board[win[i][2]]).text();
 
       if(a == player.sign && b == player.sign && c == player.sign){
-        alert('Game Over!\n' + player.sign +' Won!');
         finished = true;
         player.score++;
         break;
@@ -61,7 +72,7 @@ function Game(playerOne, playerTwo){
     }
   }
 
-  this.turn = false;
+  this.turn = true;
 
   this.sign = (function(sign){
     return sign == 'X'?'O':'X';
@@ -75,7 +86,7 @@ function Game(playerOne, playerTwo){
 
 function Player(sign){
   this.sign = sign;
-  this.turn = true;
+  this.turn = false;
   this.score = 0;
 }
 
