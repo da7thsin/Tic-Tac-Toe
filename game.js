@@ -1,20 +1,22 @@
+var finished = false;
+
+var win = [
+  [0,1,2],[3,4,5],[6,7,8], //horizontals
+  [0,3,6],[1,4,7],[2,5,8], //verticals
+  [0,4,8],[2,4,6] //diagonals
+];
+
+
 function Game(playerOne, playerTwo){
-  var board = document.getElementsByClassName('grid');
-  var finished = false;
-  var win = [
-    [0,1,2],[3,4,5],[6,7,8], //horizontals
-    [0,3,6],[1,4,7],[2,5,8], //verticals
-    [0,4,8],[2,4,6] //diagonals
-  ];
+  var board = new Board('grid');
 
   if(playerTwo == undefined){
     playerTwo = this;
   }
 
   function assign(){
-
     for(var index = 0; index < win.length; index++){
-      var a = $(board[win[index][0]]), b = $(board[win[index][1]]), c = $(board[win[index][2]]);
+      var a = $(board.grids[win[index][0]]), b = $(board.grids[win[index][1]]), c = $(board.grids[win[index][2]]);
 
       if(!c.text() && a.text() == playerOne.sign && b.text() == playerOne.sign || a.text() == playerTwo.sign && b.text() == playerTwo.sign){
         c.text(playerTwo.sign);
@@ -30,7 +32,7 @@ function Game(playerOne, playerTwo){
       }
 
     }
-    
+
   }
 
   function init(){
@@ -41,7 +43,7 @@ function Game(playerOne, playerTwo){
           $(this).text(playerOne.sign);
           playerOne.turn = false;
           playerTwo.turn = true;
-          checkBoard(playerOne);
+          board.checkWinner(playerOne);
           setTimeout(init, 1000);
         }
       });
@@ -50,23 +52,8 @@ function Game(playerOne, playerTwo){
         assign();
         playerTwo.turn = false;
         playerOne.turn = true;
-        checkBoard(playerTwo);
+        board.checkWinner(playerTwo);
         setTimeout(init, 1000);
-      }
-
-    }
-  }
-
-  function checkBoard(player){
-    for(var i = 0; i < win.length; i++){
-      var a = $(board[win[i][0]]).text();
-      var b = $(board[win[i][1]]).text();
-      var c = $(board[win[i][2]]).text();
-
-      if(a == player.sign && b == player.sign && c == player.sign){
-        finished = true;
-        player.score++;
-        break;
       }
 
     }
@@ -82,6 +69,30 @@ function Game(playerOne, playerTwo){
     init();
   }
 
+}
+
+function Board(grid){
+  this.grids = document.getElementsByClassName(grid);
+
+  this.clear = function(){
+    for(var i = 0; i < this.grids.length; i++){
+      var grid = this.grids[i];
+      $(grid).text('');
+    }
+  }
+
+  this.checkWinner = function(player){
+    for(var i = 0; i < win.length; i++){
+      var a = $(this.grids[win[i][0]]).text();
+      var b = $(this.grids[win[i][1]]).text();
+      var c = $(this.grids[win[i][2]]).text();
+
+      if(a == player.sign && b == player.sign && c == player.sign){
+        finished = true;
+        break;
+      }
+    }
+  }
 }
 
 function Player(sign){
