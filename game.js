@@ -77,12 +77,14 @@ function Board(el){
   };
 
   this.checkWinner = function(player){
+    var full = !this.getEmptyTileLocations().length;
+
     for(var i = 0; i < win.length; i++){
       var a = $(this.boxes[win[i][0]]).text();
       var b = $(this.boxes[win[i][1]]).text();
       var c = $(this.boxes[win[i][2]]).text();
 
-      if(a == player.sign && b == player.sign && c == player.sign){
+      if(full || (a == player.sign && b == player.sign && c == player.sign)){
         return true;
       }
     }
@@ -149,7 +151,9 @@ function Robot(sign){
   this.assign = function(P2){
 
     if(board.isEmpty()){
-      this.firstMoveSetup(P2);
+      this.firstMove = true;
+      this.markTile(4, P2);
+      //this.firstMoveSetup(P2);
     }
     else{
       this.calculateMove(P2);
@@ -213,12 +217,13 @@ Robot.prototype = {
         else if(enemyFirstMove == 7 && (enemyLastMove == 0 || enemyLastMove == 2)){
           this.markTile(myLastMove - 3, P2);
         }
-        else if(enemyFirstMove == 3 && (enemyLastMove == 1 || enemyLastMove == 8)){
+        else if(enemyFirstMove == 3 && (enemyLastMove == 2 || enemyLastMove == 8)){
           this.markTile(myLastMove + 1, P2);
         }
         else if(enemyFirstMove == 5 && (enemyLastMove == 0 || enemyLastMove == 6)){
           this.markTile(myLastMove - 1, P2);
         }
+
       }
       else if(odds.indexOf(enemyFirstMove) != -1){
 
@@ -245,14 +250,6 @@ Robot.prototype = {
 
   },
 
-  findEmptyTiles: function(){
-    var tiles = [];
-
-    for(var i = 0; i < board.boxes.length; i++){
-
-    }
-  },
-
   markTile: function(index, P2){
     var tile = $(board.boxes[index]);
 
@@ -277,7 +274,8 @@ Robot.prototype = {
 
   checkWinningTile: function(tileMoves, P2){
     for(var i = 0; i < tileMoves.length; i++){
-      this.putThirdTile(tileMoves[i], P2);
+      var won = this.putThirdTile(tileMoves[i], P2);
+      if(won){ break; }
     };
   },
 
@@ -295,16 +293,18 @@ Robot.prototype = {
 
       if(a != -1 && b != -1 && !boxValC){
         this.markTile(win[i][2], P2);
-        break;
+        return true;
       }else if(!boxValA && b != -1 && c != -1){
         this.markTile(win[i][0], P2);
-        break;
+        return true;
       }else if(a != -1 && !boxValB && c != -1){
         this.markTile(win[i][1], P2);
-        break;
+        return true;
       }
 
     }
+
+    return false;
   }
 }
 
