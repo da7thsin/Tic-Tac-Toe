@@ -77,14 +77,14 @@ function Board(el){
   };
 
   this.checkWinner = function(player){
-    var full = !this.getEmptyTileLocations().length;
+    var boardIsFull = !this.getEmptyTileLocations().length;
 
     for(var i = 0; i < win.length; i++){
       var a = $(this.boxes[win[i][0]]).text();
       var b = $(this.boxes[win[i][1]]).text();
       var c = $(this.boxes[win[i][2]]).text();
 
-      if(full || (a == player.sign && b == player.sign && c == player.sign)){
+      if(boardIsFull || (a == player.sign && b == player.sign && c == player.sign)){
         return true;
       }
     }
@@ -101,20 +101,6 @@ function Board(el){
     this.moves.O = [];
   };
 
-  this.isEmpty =  function(){
-      var tiles = [];
-
-      for(var i = 0; i < board.boxes.length; i++){
-        var box = $(board.boxes[i]).text();
-
-        if(box == ''){
-          tiles.push(i);
-        }
-      }
-
-      return tiles.length === board.boxes.length ? true : false;
-  };
-
 }
 
 function Player(sign){
@@ -126,7 +112,6 @@ function Player(sign){
     var self = this;
 
     $('.box').click(function(){
-
       if(!$(this).text() && self.turn){
         $(this).text(self.sign);
         finished = board.checkWinner(self);
@@ -149,8 +134,9 @@ function Robot(sign){
   this.score = 0;
 
   this.assign = function(P2){
+    var boardIsEmpty = board.getEmptyTileLocations().length === board.boxes.length;
 
-    if(board.isEmpty()){
+    if(boardIsEmpty){
       this.firstMove = true;
       this.markTile(4, P2);
       //this.firstMoveSetup(P2);
