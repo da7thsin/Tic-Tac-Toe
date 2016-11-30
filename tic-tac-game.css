@@ -8,11 +8,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%,-50%);
-  max-width: 345px;
-  max-height: 345px;
-  min-width: 300px;
-  min-height: 300px;
-  border: 1px solid black;
+  width: 345px;
+  height: 345px;
 }
 
 .box{
@@ -45,7 +42,12 @@
 }
 
 @media only screen and (min-width: 300px) and (max-width: 600px){
-  .grid{
+  .board{
+    width: 300px;
+    height: 300px;
+  }
+
+  .box{
     width: 84px;
     height: 84px;
     line-height: 84px;
