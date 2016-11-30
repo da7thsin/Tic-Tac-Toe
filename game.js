@@ -6,6 +6,10 @@ var win = [
   [0,4,8],[2,4,6]
 ];
 
+
+
+
+//GAME CONSTRUCTOR
 function Game(P1, P2){
   var self = this;
 
@@ -22,7 +26,7 @@ Game.prototype = {
       this.swapTurn(P1,P2);
     }
     else{
-      this.restart();
+      this.restart(P1, P2);
     }
   },
 
@@ -34,12 +38,20 @@ Game.prototype = {
     }
   },
 
-  restart: function(){
+  restart: function(P1, P2){
+    if(P2.hasOwnProperty('firstMove')){
+      P2.firstMove = false;
+    }
+
+    helper.setRandomTurn(P1, P2);
     board.clear();
-    finished = false;
   }
 }
 
+
+
+
+//BOARD CONSTRUCTOR
 function Board(el){
   this.boxes = document.getElementsByClassName(el);
 
@@ -99,10 +111,15 @@ function Board(el){
 
     this.moves.X = [];
     this.moves.O = [];
+    finished = false;
   };
 
 }
 
+
+
+
+//PLAYER CONSTRUCTOR
 function Player(sign){
   this.sign = sign;
   this.turn = false;
@@ -110,7 +127,6 @@ function Player(sign){
 
   this.assign = function(P2){
     var self = this;
-
     $('.box').click(function(){
       if(!$(this).text() && self.turn){
         $(this).text(self.sign);
@@ -128,18 +144,20 @@ function Player(sign){
   }
 }
 
+
+
+
+//ROBOT CONSTRUCTOR
 function Robot(sign){
   this.sign = sign == 'X' ? 'O' : 'X';
-  this.turn = true;
+  this.turn = false;
   this.score = 0;
 
   this.assign = function(P2){
     var boardIsEmpty = board.getEmptyTileLocations().length === board.boxes.length;
 
     if(boardIsEmpty){
-      this.firstMove = true;
-      this.markTile(4, P2);
-      //this.firstMoveSetup(P2);
+      this.firstMoveSetup(P2);
     }
     else{
       this.calculateMove(P2);
@@ -160,11 +178,13 @@ Robot.prototype = {
 
     this.checkWinningTile(tileMoves, P2);
 
-    if(this.firstMove){
-      this.winAndBlock(myMoves, enemyMoves, P2);
-    }
-    else{
-      this.blockAndWin(myMoves, enemyMoves, P2);
+    if(this.turn && !finished){
+      if(this.firstMove){
+        this.winAndBlock(myMoves, enemyMoves, P2);
+      }
+      else{
+        this.blockAndWin(myMoves, enemyMoves, P2);
+      }
     }
 
   },
@@ -172,10 +192,13 @@ Robot.prototype = {
   winAndBlock: function(myMoves, enemyMoves, P2){
     var random = Math.round(Math.random());
 
-    var three = random ? 3 : -3;
-    var one = random ? 1 : -1;
+    var downOrRight = random ? 3 : 1;
+    var downOrLeft = random ? 3 : -1;
 
-    var lastTile = board.getEmptyTileLocations();
+    var upOrRight = random ? -3 : 1;
+    var upOrLeft = random ? -3 : -1;
+
+    var emptyTiles = board.getEmptyTileLocations();
 
     var enemyLastMove = enemyMoves[enemyMoves.length - 1];
     var enemyFirstMove = enemyMoves[0];
@@ -187,15 +210,14 @@ Robot.prototype = {
     var evens = [1,3,5,7];
     var center = 4;
 
-    if(myFirstMove == center && !finished){
+    if(myFirstMove == center){
 
       if(evens.indexOf(enemyFirstMove) != -1){
-
         if(enemyLastMove == 1 || enemyLastMove == 7){
-          this.markTile(enemyLastMove + one, P2);
+          this.markTile(enemyLastMove + helper.plusOrMinus(1), P2);
         }
         else if(enemyLastMove == 3 || enemyLastMove == 5){
-          this.markTile(enemyLastMove + three, P2);
+          this.markTile(enemyLastMove + helper.plusOrMinus(3), P2);
         }
         else if(enemyFirstMove == 1 && (enemyLastMove == 6 || enemyLastMove == 8)){
           this.markTile(myLastMove + 3, P2);
@@ -209,30 +231,121 @@ Robot.prototype = {
         else if(enemyFirstMove == 5 && (enemyLastMove == 0 || enemyLastMove == 6)){
           this.markTile(myLastMove - 1, P2);
         }
-
       }
       else if(odds.indexOf(enemyFirstMove) != -1){
-
         if(enemyLastMove == 0 || enemyLastMove == 6){
           this.markTile(myLastMove + 1, P2);
         }
         else if(enemyLastMove == 2 || enemyLastMove == 8){
           this.markTile(myLastMove - 1, P2);
         }
-        else if(lastTile.length == 1){
-          this.markTile(lastTile[0], P2);
+        else if(emptyTiles.length == 1){
+          this.markTile(emptyTiles[0], P2);
         }
-
       }
 
     }
-    else if(odds.indexOf(myFirstMove) != -1 && !finished){
+    else if(odds.indexOf(myFirstMove) != -1){
+
+      if(evens.indexOf(enemyFirstMove) != -1){
+        if(enemyFirstMove == 1 && (enemyLastMove == 6 || enemyLastMove == 8)){
+          this.markTile(myFirstMove + 3, P2);
+        }
+        else if(enemyFirstMove == 7 && (enemyLastMove == 0 || enemyLastMove == 2)){
+          this.markTile(myFirstMove - 3, P2);
+        }
+        else if(enemyFirstMove == 3 && (enemyLastMove == 2 || enemyLastMove == 8)){
+          this.markTile(myFirstMove + 1, P2);
+        }
+        else if(enemyFirstMove == 5 && (enemyLastMove == 0 || enemyLastMove == 6)){
+          this.markTile(myFirstMove - 1, P2);
+        }
+        else{
+          this.markTile(center, P2);
+        }
+      }
+      else if(odds.indexOf(enemyFirstMove) != -1){
+        if(emptyTiles.length < 7){
+          this.markTile(helper.randomArrVal(emptyTiles), P2);
+        }
+        else{
+          this.markTile(center, P2);
+        }
+      }
+      else if(enemyFirstMove == center){
+        if(myFirstMove == 0){
+          this.markTile(myLastMove + downOrRight, P2);
+        }
+          else if(myFirstMove == 2){
+          this.markTile(myLastMove + downOrLeft,P2);
+        }
+          else if(myFirstMove == 6){
+          this.markTile(myLastMove + upOrRight, P2);
+        }
+          else if(myFirstMove == 8){
+          this.markTile(myLastMove + upOrLeft, P2);
+        }
+        else{
+          this.markTile(emptyTiles[0], P2);
+        }
+      }
 
     }
 
   },
 
   blockAndWin: function(myMoves, enemyMoves, P2){
+    var random = Math.round(Math.random());
+
+    var emptyTiles = board.getEmptyTileLocations();
+
+    var enemyLastMove = enemyMoves[enemyMoves.length - 1];
+    var enemyFirstMove = enemyMoves[0];
+
+    var myLastMove = myMoves[myMoves.length -1];
+    var myFirstMove = myMoves[0];
+
+    var odds = [0,2,6,8];
+    var evens = [1,3,5,7];
+    var center = 4;
+
+    if(enemyFirstMove == center){
+      if(emptyTiles.length > 4){
+        this.markTile(helper.randomArrVal(odds), P2);
+      }
+      else{
+        this.markTile(helper.randomArrVal(emptyTiles), P2);
+      }
+    }
+    else{
+      if(myFirstMove == undefined){
+        this.markTile(center, P2);
+      }
+      else if(emptyTiles.length > 4){
+
+        if(evens.indexOf(enemyFirstMove) > -1 && evens.indexOf(enemyLastMove) > -1){
+          if(enemyLastMove == 1 || enemyLastMove == 7){
+            this.markTile(enemyLastMove + helper.plusOrMinus(1), P2);
+          }
+          else{
+            this.markTile(enemyLastMove + helper.plusOrMinus(3), P2);
+          }
+        }
+        else if(enemyLastMove == 1 || enemyLastMove == 7){
+          this.markTile(myFirstMove + helper.plusOrMinus(1), P2);
+        }
+        else if(enemyLastMove == 3 || enemyLastMove == 5){
+          this.markTile(myFirstMove + helper.plusOrMinus(3), P2);
+        }
+        else{
+          this.markTile(helper.randomArrVal(evens), P2);
+        }
+
+      }
+      else{
+        this.markTile(helper.randomArrVal(emptyTiles), P2);
+      }
+    }
 
   },
 
@@ -295,14 +408,29 @@ Robot.prototype = {
 }
 
 
-function set(P1, P2){
-  if(Math.random() < 0.5){
-    P2.turn = false;
-    P1.turn = true;
-  }
-  else{
-    P2.turn = true;
-    P1.turn = false;
+
+var helper = {
+  plusOrMinus: function(n){
+    var random = Math.round(Math.random());
+    return random ? n : -n;
+  },
+
+  randomArrVal: function(arr){
+    var randomIndex =  Math.floor(Math.random() * arr.length);
+    return arr[randomIndex];
+  },
+
+  setRandomTurn: function(P1, P2){
+    var random = Math.round(Math.random());
+
+    if(random){
+      P2.turn = false;
+      P1.turn = true;
+    }
+    else{
+      P2.turn = true;
+      P1.turn = false;
+    }
   }
 }
 
@@ -311,6 +439,6 @@ $('button').click(function(){
   $('.board').toggleClass('active');
   var P1 = new Player($(this).text());
   var P2 = new Robot(P1.sign);
-  //set(P1, P2);
+  helper.setRandomTurn(P1, P2);
   new Game(P1, P2);
 });
