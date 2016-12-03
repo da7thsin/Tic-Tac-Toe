@@ -6,7 +6,7 @@ body{
 
 .back{
   position: absolute;
-  bottom: 7%;
+  bottom: 17px;
   left: 50%;
   transform: translateX(-50%);
   width: 55px;
