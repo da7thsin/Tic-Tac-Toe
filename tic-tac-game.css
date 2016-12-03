@@ -1,55 +1,186 @@
-.active{
-  display: block;
+body{
+  background: #18b96f;
+  color: white;
+  font-family: sans-serif;
 }
 
-.board{
-  display: none;
+.back{
   position: absolute;
-  top: 50%;
+  bottom: 7%;
   left: 50%;
-  transform: translate(-50%,-50%);
-  width: 345px;
-  height: 345px;
+  transform: translateX(-50%);
+  width: 55px;
+  height: 30px;
+  font-size: 15px;
+  text-align: center;
+  line-height: 30px;
+  background: rgba(0,0,0,0.8);
+  border-radius: 15px;
+  transition-duration: 0.3s;
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
-.box{
-  display: inline-block;
-  margin: 5px;
-  width: 99px;
-  height: 99px;
-  border: 1px solid black;
-  text-align: center;
-  line-height: 99px;
-  vertical-align: top;
+.back:hover{
+  cursor: pointer;
+  background: rgba(255,255,255,0.8);
+  color: #000;
+}
+
+.menu, .board{
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
   transition-duration: 0.3s;
+  text-align: center;
 }
 
 .menu{
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 390px;
+  height: 390px;
+  box-shadow: 0px 7px 8px #000;
 }
 
-.box:hover{
-  background: rgb(255,80,90);
+.menu .mode-choice{
+  position: relative;
+  font-size: 25px;
+  height: 130px;
+  width: 100%;
+  line-height: 130px;
+  transition-duration: 0.3s;
+  overflow: hidden;
+}
+
+.mode-choice .text, .mode-choice .btn-choice{
+  transition-duration: 0.3s;
+  width: 100%;
+  height: 100%;
+}
+
+
+.mode-choice .text, .mode-choice .container{
+  position: relative;
+}
+
+.container{
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: left 0.5s;
+}
+
+.mode-choice .btn-choice{
+  position: absolute;
+  top: 0;
+  left: -390px;
+  background: #37745e;
+}
+
+.btn-choice .btn{
+  display: inline-block;
+  width: 190px;
+  height: 100%;
+}
+
+.btn:hover{
+  background: #fff;
+  color: #37745e;
+}
+
+.move-active{
+  left: 390px;
+}
+
+.mode-choice:hover{
   cursor: pointer;
 }
 
-.active{
-  display: block;
+.pvc .container .text:hover{
+  background: #fff;
+  color: #000;
+  border-left: 8px solid #37745e;
+}
+
+.pvp:hover, .cvc:hover{
+  color: #000;
+  background: #fff;
+}
+
+.board{
+  z-index: -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  width: 405px;
+  height: 405px;
+}
+
+.box{
+  margin: 0;
+  width: 130px;
+  height: 130px;
+  background: rgba(0,0,0,0.8);
+  text-align: center;
+  line-height: 131px;
+  vertical-align: top;
+  transition: margin 0.3s 0.5s, background 0.3s, color 0.4s;
+  font-size: 35px;
+}
+
+.box:hover{
+  background: rgba(255,255,255,0.8);
+  color: #000;
+  cursor: pointer;
+}
+
+.inactive{
+  opacity: 0;
+  visibility: hidden;
+}
+
+.active .box{
+  margin: 2px;
+}
+
+.invert-color{
+  background: rgba(255,255,255,0.8);
+  color: #000;
 }
 
 @media only screen and (min-width: 300px) and (max-width: 600px){
+  .menu{
+    width: 292px;
+    height: 292px;
+  }
   .board{
-    width: 300px;
-    height: 300px;
+    width: 310px;
+    height: 310px;
+  }
+
+  .menu .mode-choice{
+    height: 98px;
+    line-height: 98px;
+    font-size: 20px;
+  }
+
+  .mode-choice .btn-choice{
+    height: 100%;
+    width: 292px;
+    left: -292px;
+  }
+
+  .btn-choice .btn{
+    height: 100%;
+    width: 141px;
+  }
+
+  .move-active{
+    left: 292px;
   }
 
   .box{
-    width: 84px;
-    height: 84px;
-    line-height: 84px;
+    width: 98px;
+    height: 98px;
+    line-height: 98px;
   }
 }

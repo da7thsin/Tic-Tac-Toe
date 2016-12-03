@@ -6,21 +6,50 @@ var win = [
   [0,4,8],[2,4,6]
 ];
 
+var game, P1, P2;
 
 
 
 //GAME CONSTRUCTOR
-function Game(P1, P2){
+function Game(P1, P2, time_cycle){
   var self = this;
 
-  function run(){
-    self.update(P1, P2);
-  }
+  this.start = function(){
+    clearTimeout(self.timeoutID);
+    $('.back').removeClass('inactive');
+    $('.board').toggleClass('active');
 
-  setInterval(run, 300);
+    self.intervalID = setInterval(function(){
+      self.update(P1, P2);
+    }, time_cycle);
+  };
+
+  this.stop = function(){
+    clearInterval(self.intervalID);
+    clearInterval(self.timeoutID);
+    board.clear();
+
+    $('.board').removeClass('active');
+    $('.box').removeClass('invert-color');
+    $('.container').removeClass('move-active');
+    $('.back').addClass('inactive');
+
+    this.timeoutID = setTimeout(function(){
+      $('.menu').toggleClass('inactive');
+    }, 1000);
+
+    P1.sign = '';
+    P1.turn = false;
+
+    P2.sign = '';
+    P2.turn = false;
+  }
 }
 
 Game.prototype = {
+  intervalID: 0,
+  timeoutID: 0,
+
   update: function(P1, P2){
     if(!finished){
       this.swapTurn(P1,P2);
@@ -39,12 +68,23 @@ Game.prototype = {
   },
 
   restart: function(P1, P2){
-    if(P2.hasOwnProperty('firstMove')){
+    var self = this;
+
+    if(P1.firstMove){
+      P1.firstMove = false;
+    }else if(P2.firstMove){
       P2.firstMove = false;
     }
 
-    helper.setRandomTurn(P1, P2);
-    board.clear();
+    clearInterval(this.intervalID);
+    $('.board').toggleClass('active');
+
+    this.timeoutID = setTimeout(function(){
+      board.clear();
+      $('.box').removeClass('invert-color');
+      helper.setRandomTurn(P1, P2);
+      self.start();
+    }, 1200);
   }
 }
 
@@ -88,17 +128,26 @@ function Board(el){
     return empty_tiles;
   };
 
-  this.checkWinner = function(player){
+  this.checkBoard = function(player){
     var boardIsFull = !this.getEmptyTileLocations().length;
 
-    for(var i = 0; i < win.length; i++){
-      var a = $(this.boxes[win[i][0]]).text();
-      var b = $(this.boxes[win[i][1]]).text();
-      var c = $(this.boxes[win[i][2]]).text();
+    if(!boardIsFull){
+      for(var i = 0; i < win.length; i++){
+        var a = $(this.boxes[win[i][0]]);
+        var b = $(this.boxes[win[i][1]]);
+        var c = $(this.boxes[win[i][2]]);
 
-      if(boardIsFull || (a == player.sign && b == player.sign && c == player.sign)){
-        return true;
+        if((a.text() == player.sign && b.text() == player.sign && c.text() == player.sign)){
+          a.addClass('invert-color');
+          b.addClass('invert-color');
+          c.addClass('invert-color');
+          return true;
+        }
       }
+    }
+    else{
+      $('.box').addClass('invert-color');
+      return true;
     }
 
     return false;
@@ -123,14 +172,13 @@ function Board(el){
 function Player(sign){
   this.sign = sign;
   this.turn = false;
-  this.score = 0;
 
   this.assign = function(P2){
     var self = this;
     $('.box').click(function(){
       if(!$(this).text() && self.turn){
         $(this).text(self.sign);
-        finished = board.checkWinner(self);
+        finished = board.checkBoard(self);
 
         if(!finished){
           self.turn = false;
@@ -151,7 +199,6 @@ function Player(sign){
 function Robot(sign){
   this.sign = sign == 'X' ? 'O' : 'X';
   this.turn = false;
-  this.score = 0;
 
   this.assign = function(P2){
     var boardIsEmpty = board.getEmptyTileLocations().length === board.boxes.length;
@@ -273,16 +320,16 @@ Robot.prototype = {
         }
       }
       else if(enemyFirstMove == center){
-        if(myFirstMove == 0){
+        if(myLastMove == 0){
           this.markTile(myLastMove + downOrRight, P2);
         }
-          else if(myFirstMove == 2){
+          else if(myLastMove == 2){
           this.markTile(myLastMove + downOrLeft,P2);
         }
-          else if(myFirstMove == 6){
+          else if(myLastMove == 6){
           this.markTile(myLastMove + upOrRight, P2);
         }
-          else if(myFirstMove == 8){
+          else if(myLastMove == 8){
           this.markTile(myLastMove + upOrLeft, P2);
         }
         else{
@@ -334,11 +381,8 @@ Robot.prototype = {
         else if(enemyLastMove == 1 || enemyLastMove == 7){
           this.markTile(myFirstMove + helper.plusOrMinus(1), P2);
         }
-        else if(enemyLastMove == 3 || enemyLastMove == 5){
+        else if(enemyLastMove == 3 || enemyLastMove == 5 || odds.indexOf(enemyLastMove) > -1){
           this.markTile(myFirstMove + helper.plusOrMinus(3), P2);
-        }
-        else{
-          this.markTile(helper.randomArrVal(evens), P2);
         }
 
       }
@@ -354,7 +398,7 @@ Robot.prototype = {
 
     if(!tile.text()){
       tile.text(this.sign);
-      finished = board.checkWinner(this);
+      finished = board.checkBoard(this);
 
       if(!finished){
         this.turn = false;
@@ -420,6 +464,12 @@ var helper = {
     return arr[randomIndex];
   },
 
+  randomTile: function(){
+    var random = Math.round(Math.random());
+
+    return random ? ['X','O'] : ['O','X'];
+  },
+
   setRandomTurn: function(P1, P2){
     var random = Math.round(Math.random());
 
@@ -434,11 +484,53 @@ var helper = {
   }
 }
 
-$('button').click(function(){
-  $('.menu').toggleClass('active');
-  $('.board').toggleClass('active');
-  var P1 = new Player($(this).text());
-  var P2 = new Robot(P1.sign);
+
+
+
+//PLAYER VS COMPUTER BUTTON LOGIC
+$('.pvc').click(function(){
+  $('.container').addClass('move-active');
+});
+
+$('.btn').click(function(){
+  $('.menu').toggleClass('inactive');
+  P1 = new Player($(this).text());
+  P2 = new Robot(P1.sign);
   helper.setRandomTurn(P1, P2);
-  new Game(P1, P2);
+
+  console.log(P1, P2);
+  game = new Game(P1, P2, 500);
+  game.start();
+});
+
+
+//PLAYER VS PLAYER BUTTON LOGIC
+$('.pvp').click(function(){
+  $('.menu').toggleClass('inactive');
+  var tile = helper.randomTile();
+
+  P1 = new Player(tile[0]);
+  P2 = new Player(tile[1]);
+  helper.setRandomTurn(P1, P2);
+  game = new Game(P1, P2, 300);
+
+  game.start();
+});
+
+
+//COMPUTER VS COMPUTER BUTTON LOGIC
+$('.cvc').click(function(){
+  $('.menu').toggleClass('inactive');
+  var tile = helper.randomTile();
+
+  P1 = new Robot(tile[0]);
+  P2 = new Robot(P1.sign);
+  helper.setRandomTurn(P1, P2);
+  game = new Game(P1, P2, 700);
+
+  game.start();
+});
+
+$('.back').click(function(){
+  game.stop();
 });
