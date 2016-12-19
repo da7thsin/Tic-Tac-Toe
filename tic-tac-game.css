@@ -1,5 +1,5 @@
 body{
-  background: #18b96f;
+  background: #18a2b9;
   color: white;
   font-family: sans-serif;
 }
@@ -72,7 +72,7 @@ body{
   position: absolute;
   top: 0;
   left: -390px;
-  background: #37745e;
+  background: #ef650d;
 }
 
 .btn-choice .btn{
@@ -97,7 +97,7 @@ body{
 .pvc .container .text:hover{
   background: #fff;
   color: #000;
-  border-left: 8px solid #37745e;
+  border-left: 8px solid #ef650d;
 }
 
 .pvp:hover, .cvc:hover{
