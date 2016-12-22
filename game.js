@@ -498,7 +498,6 @@ $('.btn').click(function(){
   P2 = new Robot(P1.sign);
   helper.setRandomTurn(P1, P2);
 
-  console.log(P1, P2);
   game = new Game(P1, P2, 500);
   game.start();
 });
